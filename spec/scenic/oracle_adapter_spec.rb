@@ -105,46 +105,19 @@ RSpec.describe Scenic::OracleAdapter do
               SELECT
                   user_scheduler_jobs.job_name,
                   JSON_OBJECT(
-                          'job_name' IS user_scheduler_jobs.job_name
+                          'job_name' IS 'job_name_never_run'
                       )
                   AS message,
                   systimestamp AS log_time
               FROM
                   user_scheduler_jobs
-                  LEFT JOIN user_scheduler_job_run_details ON user_scheduler_jobs.job_name = user_scheduler_job_run_details.job_name
-              WHERE
-                  user_scheduler_job_run_details.log_date IS NULL
-          ), run_details AS (
-              SELECT
-                  'run_details' AS job_name,
-                  JSON_OBJECT(
-                          'job_name' IS jobs.job_name
-                      )
-                  AS message,
-                  systimestamp AS log_time
-              FROM
-                      user_scheduler_jobs jobs
           )
           SELECT
               user                               AS schema,
-              sys_context('userenv', 'con_name') AS environment,
-              'health_scheduled_jobs'     AS source,
-              combined.job_name,
-              combined.message,
-              combined.log_time
+              never_run.job_name
           FROM
-              (
-                  SELECT
-                      *
-                  FROM
                       never_run
-                  UNION
-                  SELECT
-                      *
-                  FROM
-                      run_details
-              ) combined
-  EOSQL
+        EOSQL
 
         dump_schema(first_schema_file_path)
         drop_all_views
