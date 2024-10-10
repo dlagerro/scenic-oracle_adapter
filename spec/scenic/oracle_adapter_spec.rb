@@ -101,22 +101,11 @@ RSpec.describe Scenic::OracleAdapter do
         EOSQL
 
         adapter.create_view("problematic_view", <<-EOSQL)
-      WITH never_run AS (
-              SELECT
-                  user_scheduler_jobs.job_name,
-                  JSON_OBJECT(
-                          'job_name' IS 'job_name_never_run'
-                      )
-                  AS message,
-                  systimestamp AS log_time
-              FROM
-                  user_scheduler_jobs
-          )
-          SELECT
-              user                               AS schema,
-              never_run.job_name
+      SELECT
+          'problematic' as test
           FROM
-                      never_run
+            dual
+      ;
         EOSQL
 
         dump_schema(first_schema_file_path)
